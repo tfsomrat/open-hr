@@ -4,6 +4,7 @@ import NextAuth from "next-auth";
 import { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
+import { getDevicePlatform } from "./lib/device-finder";
 
 async function refreshAccessToken(token: JWT) {
   try {
@@ -13,6 +14,7 @@ async function refreshAccessToken(token: JWT) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-device-name": getDevicePlatform(),
         },
         body: JSON.stringify({
           refreshToken: token.refreshToken,
@@ -66,6 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 headers: {
                   "Content-Type": "application/json",
                   authorization_token: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
+                  "x-device-name": getDevicePlatform(),
                 },
                 body: JSON.stringify({
                   token: credentials.token,
@@ -82,6 +85,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 headers: {
                   "Content-Type": "application/json",
                   authorization_token: `Bearer ${process.env.NEXT_PUBLIC_BEARER_TOKEN}`,
+                  "x-device-name": getDevicePlatform(),
                 },
                 body: JSON.stringify({
                   email: credentials.email,
@@ -141,9 +145,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.type === "credentials") {
         return !!user;
       }
-      const res = await Axios.post("/authentication/oauth-login", {
-        email: user.email,
-      });
+      const res = await Axios.post(
+        "/authentication/oauth-login",
+        {
+          email: user.email,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-device-name": getDevicePlatform(),
+          },
+        }
+      );
 
       if (res.status === 200) {
         user.id = res.data.result.userId;

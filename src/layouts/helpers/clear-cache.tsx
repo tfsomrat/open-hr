@@ -42,7 +42,7 @@ const ClearCache = () => {
     <>
       {!announcementCloseState && (
         <button
-          className="p-4 bg-yellow-100 w-full mb-4 text-center rounded border border-yellow-200"
+          className="p-4 bg-yellow-100 w-full mb-4 text-center rounded border border-yellow-200 cursor-pointer"
           onClick={cookieHandler}
         >
           <Info className="mr-2 inline-block" size={20} />
